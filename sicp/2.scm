@@ -242,3 +242,117 @@
             (next (+ k 1))))))
   (next 0))
   
+(define (range low high)
+  (if (> low high)
+      '()
+      (cons low (enumerate-interval (+ 1 low) high))))
+
+(range 0 20)
+
+(define (enumerate-tree tree)
+  (if (null? tree)
+      '()
+      (if (pair? tree)
+          (cons (enumerate-tree (car tree)) (enumerate-tree (cdr tree)))
+          tree)))
+
+(enumerate-tree (list 1 2))
+(enumerate-tree (list 1 2 3))
+(define lista (cons 1 (cons 2 (cons 3 '()))))
+(enumerate-tree lista )
+
+(define (enumerate-tree tree)
+  (if (null? tree)
+      '()
+      (if (pair? tree)
+          (append (enumerate-tree (car tree)) (enumerate-tree (cdr tree)))
+          (list tree))))
+
+
+(define lista (list 1 (list 2 3)))
+(enumerate-tree lista )
+
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op initial (cdr sequence)))))
+
+(accumulate + 0 (list 1 2 3 4 5))
+(define (map p sequence)
+  (accumulate (lambda (x y) (cons (p x) (map p (cdr sequence)))) '() sequence))
+
+(map (lambda (x) (* x 2)) (list 1 2 3))
+
+(define (append s1 s2)
+  (accumulate cons s2 s1))
+
+(append (list 1 2) (list 3 4))
+
+(define (length sequence)
+  (accumulate (lambda (x y) (+ 1 (length (cdr sequence)))) 0 sequence))
+
+(define (length sequence)
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+
+(length (list 1 2 3 4))
+(length (list 1 2 3 4 6 7))
+(length (list 1 ))
+
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-terms) (+ (* higher-terms x) this-coeff))
+              0
+              coefficient-sequence))
+
+(horner-eval 2 (list 1 3 0 5 0 1))
+
+(define seqs (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+(map car seqs)
+(map cdr seqs)
+
+(define (accumulate-n op init seqs)
+  (if (null?  (car seqs))
+      '()
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
+
+(accumulate-n + 0 seqs)
+(accumulate-n * 1 seqs)
+
+(accumulate + 0 (accumulate-n * 1 seqs))
+
+(define m1 (list (list 1 2 3) (list 4 5 6) (list 7 8 9)))
+(define m2 (list (list 11 12 13) (list 14 15 16) (list 17 18 19)))
+(define column (map car m2))
+(define row (car m1))
+(list row column)
+
+(accumulate-n * 1 (list row column))
+
+; Devuelve la primer fila
+(define (n-row m1 m2)
+  (if (null? (car m2))
+      '()
+      (let ((row (car m1))
+            (column (map car m2)))
+        (cons (accumulate +  0 (accumulate-n * 1 (list row column)))
+              (n-row m1 (map cdr m2))))))
+
+(n-row m1 m2)
+
+; Hace el producto
+(define (dot-product m1 m2)
+  (if (null? m1)
+      '()
+      (cons (n-row m1 m2) (dot-product (cdr m1) m2))))
+
+(dot-product m1 m2)
+
+; No funciona
+(define (dot-product m1 m2)
+  (accumulate + 0 (map * m1 m2)))
+
+
+
+
+

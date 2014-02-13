@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+        Sprite Demonstration
+        </title>
+        <style type="text/css">
+            .draw-target {
+                width:640px;
+                height:480px;
+                background-color: #ccf;
+                position:relative;
+                float: left;
+                margin: 5px;
+            }
+        </style>
+
+        <script type="text/javascript" src="jquery.js"> </script>
+        <script type="text/javascript" src="2.js"> </script>
+        <script> 
+            $(function() {
+                /*
+                var params = {
+                    images: '2_sprites.png',
+                    images_width: 256,
+                    width: 64,
+                    height: 64,
+                    $draw_target: $('#draw-target')
+                };
+
+                var sprite1 = DHTMLSprite(params);
+                sprite1.draw(64, 64);
+
+                var sprite2 = DHTMLSprite(params);
+                sprite2.change_image(5);
+                sprite2.draw(352, 192);
+                */
+
+                //bouncyBoss(50, $('#draw-target'));
+
+                $('.draw-target').bouncyPlugin({
+                    num_bouncy: 20,
+                    bgColor: '#8ff'
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="draw-target"> </div>
+        <div class="draw-target"> </div>
+        <div class="draw-target"> </div>
+        <div class="draw-target"> </div>
+    </body>
+</html>
