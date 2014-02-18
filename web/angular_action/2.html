@@ -1,0 +1,94 @@
+<!doctype html>
+<html ng-app='Angello'>
+  <head>
+    <title>My Angular App</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+    <script src="2.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+  </head>
+  <body>
+      <div ng-controller="MainCtrl">
+          <div class="span4 sidebar-content">
+              <h2>Stories</h2>
+              <div class="story" 
+                  ng-repeat="story in stories"
+                  ng-click="setCurrentStory(story)">
+                  <h4>{{ story.title }} </h4>
+                  <p>{{ story.description }} </p>
+              </div>
+              <a class="btn" ng-click="createStory()">
+                <i class="icon-plus"></i>
+              </a>
+          </div>
+          <br>
+
+          <div class="span6 body-content">
+              <h2>Story</h2>
+              <form class="form-horizontal">
+                  <div class="control-group">
+                      <label class="control-label" for="inputTitle">Title</label>
+                      <div class="controls">
+                          <input type="text"
+                                 placeholder="Title"
+                                 ng-model="currentStory.title">
+                      </div>
+                  </div>
+                  <div class="control-group">
+                      <label class="control-label" for="inputStatus">Status</label>
+                      <div class="controls">
+                          <select id="inputStatus"
+                              ng-model="currentStatus"
+                              ng-change="setCurrentStatus(currentStatus)"
+                              ng-options="s.name for s in statuses">
+                          </select>
+                      </div>
+                  </div>
+                  <div class="control-group">
+                      <label class="control-label" for="inputType">Type</label>
+                      <div class="controls">
+                          <select id="inputType"
+                              ng-model="currentType"
+                              ng-change="setCurrentType(currentType)"
+                              ng-options="s.name for s in types">
+                          </select>
+                      </div>
+                  </div>
+                  <div class="control-group">
+                      <label class="control-label" for="inputCriteria">Critera</label>
+                      <div class="controls">
+                          <input type="text"
+                                 placeholder="Criteria"
+                                 ng-model="currentStory.criteria">
+                      </div>
+                  </div>
+                  <div class="control-group">
+                      <label class="control-label" for="inputReporter">Reporter</label>
+                      <div class="controls">
+                          <input type="text"
+                                 placeholder="Reporter"
+                                 ng-model="currentStory.reporter">
+                      </div>
+                  </div>
+                  <div class="control-group">
+                      <label class="control-label" for="inputAssignee">Assignee</label>
+                      <div class="controls">
+                          <input type="text"
+                                 placeholder="Assignee"
+                                 ng-model="currentStory.assignee">
+                      </div>
+                  </div>
+                  <div class="control-group">
+                      <label class="control-label" for="inputDescripcion">Description</label>
+                      <div class="controls">
+                          <textarea id="inputDescripcion"
+                              placehodler="Description"
+                              rows="3"
+                              ng-model="currentStory.description">
+                          </textarea>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </body>
+</html>

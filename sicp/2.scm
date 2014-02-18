@@ -245,7 +245,7 @@
 (define (range low high)
   (if (> low high)
       '()
-      (cons low (enumerate-interval (+ 1 low) high))))
+      (cons low (range (+ 1 low) high))))
 
 (range 0 20)
 
@@ -340,19 +340,135 @@
 
 (n-row m1 m2)
 
-; Hace el producto
-(define (dot-product m1 m2)
+; Hace el producto de dos matrices no de dos vectores como es en el libro
+(define (m*m m1 m2)
   (if (null? m1)
       '()
-      (cons (n-row m1 m2) (dot-product (cdr m1) m2))))
+      (cons (n-row m1 m2) (m*m (cdr m1) m2))))
 
-(dot-product m1 m2)
+(m*m m1 m2)
 
-; No funciona
+; No funciona con matrices si con vectores, mire mal
 (define (dot-product m1 m2)
   (accumulate + 0 (map * m1 m2)))
 
+(dot-product (list 1 2 3) (list 4 5 6))
+
+(define v1 (list 20 21 22))
+(accumulate +  0 (accumulate-n * 1 (list (car m1) v1)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (s) (accumulate +  0 (accumulate-n * 1 (list s v)))) m ))
+
+(matrix-*-vector m1 v1)
+
+(define (transpose mat)
+  (accumulate-n cons '() mat))
+
+(transpose m1)
+
+(define (m*m m n)
+  (let ((cols (transpose n)))
+    (map (lambda (row)
+           (map (lambda (col)
+                (accumulate +  0 (accumulate-n * 1 (list row col))))
+                cols))
+         m)))
+        
+(m*m m1 m2)
+
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+
+(define fold-right accumulate)
+
+(fold-right / 1 (list 1 2 3))
+(fold-left / 1 (list 1 2 3))
+
+(fold-right list '() (list 1 2 3))
+(fold-left list '() (list 1 2 3))
+
+(fold-right + 0 (list 1 2 3))
+(fold-left +  0 (list 1 2 3))
+
+; 2.39 Verlo mas tarde
+(define (reverse sequence)
+  (fold-right (lambda (x y ) 
+                 (display x)
+                 (display " ")
+                 (display y)
+                 (newline)
+                 (if  (null? y)
+                      x
+                      (cons y x)))
+                '() sequence))
+
+(reverse (list 1 2 3))
+
+(define (reverse sequence)
+  (fold-left (lambda (x y ) (cons y x )) '() sequence))
+
+(reverse (list 1 2 3))
 
 
+(define enumerate-interval range)
+(define nil '())
 
+(range 1 0)
+(range 1 2)
+
+(accumulate append
+            nil
+            (map  (lambda (i)
+                    (map (lambda (j) (list i j))
+                         (enumerate-interval 1 (- i 1))))
+                  (enumerate-interval 1 6)))
+
+(define (flatmap proc seq)
+  (accumulate append nil (map proc seq)))
+
+; Permutando: ni cerca
+(define l1 (list 1 2 3 4))
+(append (cdr l1) (list (car l1)))
+(list l1)
+(define ls (list (list 1 2) (list 2 3)))
+(append (list l1) ls)
+(append (list l1) nil)
+
+(define (p l n)
+  (define (iter l-tmp i result)
+    (if (= i (length l))
+        result
+        (iter (append (cdr l-tmp) (list (car l-tmp))) 
+              (+ i 1) 
+              (append (list (append (list n) l-tmp)) result))))
+  (iter l 0 nil))
+             
+(p (list 1 2 3) 4)
+
+(define (p2 l)
+  (define (iter l-tmp i result)
+    (if (= i (length l))
+      result
+      (iter (append (cdr l-tmp) (list (car l-tmp))) 
+            (+ i 1) 
+            (append (p (cdr l-tmp) (car l-tmp)) result))))
+  (iter l 0 nil))
+
+(length (p2 (list 1 2 3)))
+(p2 (list 1 2 3 4))
+(length (p2 (list 1 2 3 4)))
+(length (p2 (list 1 2 3 4 5)))
+
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j) (list i j)) (range (+ i 1) n)))
+           (range 1 n)))
+
+(unique-pairs 4)
 
