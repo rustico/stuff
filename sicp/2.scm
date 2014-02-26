@@ -472,3 +472,53 @@
 
 (unique-pairs 4)
 
+; Pensarlo
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter
+            (lambda (positions) (safe? k positions))
+            (flatmap
+              (lambda (rest-of-queens)
+                (map  (lambda (new-row)
+                        (adjoin-position new-row
+                                         k
+                                         rest-of-queens))
+                      (range 1 board-size)))
+              (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+
+;2.3
+
+(list 'a 'b)
+(define letters '(a b c d e))
+(car letters)
+(cdr letters)
+
+(define (memq item x)
+  (cond ((null? x) false)
+        ((eq? item  (car x)) x)
+        (else (memq item (cdr x)))))
+
+(memq 'apple '(pear bannana prune))
+(memq 'apple '(pear (apple sauce) bannana apple y prune))
+(eq? 1 1)
+(eq? 'nico 'nico)
+
+(pair? (car '(a short list)))
+
+(define (equal? a b)
+  (cond ((and (not (pair? (car a))) (not (pair? (car b))))
+            (and (eq? (car a) (car b)) (equal? (cdr a) (cdr b))))
+        ((and (pair? (car a)) (pair? (car b)))
+            (and (equal? (car a) (car b)) (equal? (cdr a) (cdr b))))
+        (else #f)))
+
+(equal? (list 1 2 3 4) (list 1 2 3 4))
+(equal? (list 1 2 3 4) (list 1 2 3))
+(equal? (list 1 2 3 4) (list 1 2 4 3))
+(equal? '(this is a list) '(this is a list))
+(equal? '(this is a list) '(this (is a) list))
+(equal? '(this (is a) list) '(this (is a) list))
