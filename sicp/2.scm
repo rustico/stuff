@@ -522,3 +522,75 @@
 (equal? '(this is a list) '(this is a list))
 (equal? '(this is a list) '(this (is a) list))
 (equal? '(this (is a) list) '(this (is a) list))
+
+(car '(+ x 2))
+(cdr '(+ x 2))
+(pair? (cdr '(+ x 2)))
+(cadr '(+ x 2))
+(cddr '(+ x 2))
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp) 
+            (if (same-variable? exp var) 1 0))
+        ((sum? exp) 
+            (make-sum (deriv (addend exp) var)
+                      (deriv (augend exp) var)))
+        ((product? exp)
+            (make-sum
+                (make-product (multiplier exp)
+                              (deriv (multiplicand exp) var))
+                (make-product (deriv (multiplier exp) var)
+                              (multiplicand exp))))
+        (else (error "unknown expression type"))))
+
+(define variable? symbol?)
+(define (same-variable? v1 v2) 
+  (and (variable? v1) (variable? v2) (eq? v1 v2)))
+
+(define (sum? e) 
+  (and (pair? e) (eq? (car e) '+)))
+
+(define (addend e) 
+  (cadr e))
+
+(define (augend e) (caddr e))
+
+(define (make-sum a1 a2)
+  (list '+ a1 a2))
+(make-sum 2 3)
+
+(define (product? e) 
+  (and (pair? e) (eq? (car e) '*)))
+(product? (list '* 2 3))
+(product? (list '+ 2 3))
+(sum? (list '+ 2 3))
+(sum? (list '* 2 3))
+(define (multiplier e) (cadr e))
+(define (multiplicand e) (caddr e))
+(multiplicand (list '* 2 3))
+(define (make-product m1 m2)
+  (list '* m1 m2))
+(make-product 2 3)
+
+(deriv 2 'x)
+(deriv 'x 'x)
+(deriv 'y 'x)
+
+(deriv '(+ x 3) 'x)
+(deriv '(* x y) 'x)
+(deriv '(* (* x y) (+ x 3)) 'x)
+
+(define (make-sum a1 a2)
+  (cond ((eq? a1 0) a2)
+        ((eq? a2 0) a1)
+        ((and (number? a1) (number? a2)) (+ a1 a2))
+        (else (list '+ a1 a2))))
+
+
+(define (make-product a1 a2)
+  (cond ((or (eq? a1 0) (eq? a2 0)) 0)
+        ((eq? a1 1) a2)
+        ((eq? a2 1) a1)
+        ((and (number? a1) (number? a2)) (* a1 a2))
+        (else (list '* a1 a2))))
