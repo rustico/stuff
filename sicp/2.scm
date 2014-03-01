@@ -529,20 +529,6 @@
 (cadr '(+ x 2))
 (cddr '(+ x 2))
 
-(define (deriv exp var)
-  (cond ((number? exp) 0)
-        ((variable? exp) 
-            (if (same-variable? exp var) 1 0))
-        ((sum? exp) 
-            (make-sum (deriv (addend exp) var)
-                      (deriv (augend exp) var)))
-        ((product? exp)
-            (make-sum
-                (make-product (multiplier exp)
-                              (deriv (multiplicand exp) var))
-                (make-product (deriv (multiplier exp) var)
-                              (multiplicand exp))))
-        (else (error "unknown expression type"))))
 
 (define variable? symbol?)
 (define (same-variable? v1 v2) 
@@ -554,10 +540,18 @@
 (define (addend e) 
   (cadr e))
 
-(define (augend e) (caddr e))
+(define (augend e) 
+  (caddr e))
+
+(define (augend e) 
+  (let ((v (cddr e)))
+    (if (null? (cdr v))
+        (car v)
+        (append '(+) v))))
 
 (define (make-sum a1 a2)
-  (list '+ a1 a2))
+      (list '+ a1 a2))
+
 (make-sum 2 3)
 
 (define (product? e) 
@@ -566,8 +560,17 @@
 (product? (list '+ 2 3))
 (sum? (list '+ 2 3))
 (sum? (list '* 2 3))
+
 (define (multiplier e) (cadr e))
 (define (multiplicand e) (caddr e))
+
+
+(define (multiplicand e) 
+  (let ((v (cddr e)))
+    (if (null? (cdr v))
+        (car v)
+        (append '(*) v))))
+
 (multiplicand (list '* 2 3))
 (define (make-product m1 m2)
   (list '* m1 m2))
@@ -594,3 +597,58 @@
         ((eq? a2 1) a1)
         ((and (number? a1) (number? a2)) (* a1 a2))
         (else (list '* a1 a2))))
+
+(define (make-exponentiation b e)
+  (cond ((eq? b 0) 0)
+        ((eq? e 1) b)
+        ((eq? e 0) 1)
+        (else (list '** b e))))
+
+(define e1 (make-exponentiation 2 3))
+(define (exponentiation? e)
+  (and (pair? e) (eq? (car e) '**)))
+
+(exponentiation? e1)
+
+(define (base e) (cadr e))
+(define (exponent e) (caddr e))
+(base e1)
+(exponent e1)
+
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp) 
+            (if (same-variable? exp var) 1 0))
+        ((sum? exp) 
+            (make-sum (deriv (addend exp) var)
+                      (deriv (augend exp) var)))
+        ((product? exp)
+            (make-sum
+                (make-product (multiplier exp)
+                              (deriv (multiplicand exp) var))
+                (make-product (deriv (multiplier exp) var)
+                              (multiplicand exp))))
+        ((exponentiation? exp)
+            (make-product (make-product (exponent exp) 
+                                        (make-exponentiation (base exp) (- (exponent exp) 1)))
+                          (deriv (base exp) var)))
+        (else (error "unknown expression type"))))
+
+(define ex (make-exponentiation 'x 3))
+(deriv ex 'x)
+
+(deriv '(* x y (+ x 3)) 'x)
+'(+ x 3 (** x 3))
+(deriv '(+ x 3 (** x 3)) 'x)
+
+(deriv '(+ x 3 x) 'x)
+(deriv '(+ x x 3) 'x)
+
+(deriv '(+ x 3 x) 'x)
+(deriv '(* x 3 x) 'x)
+
+(deriv '(* x y (+ x 3)) 'x)
+ (deriv '(* (* x y) (+ x 3)) 'x) 
+
+
