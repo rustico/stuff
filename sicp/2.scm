@@ -869,3 +869,33 @@
       
 (union-tree t1 t2)
 (intersection-tree t1 t2)
+
+; Huffman
+(define (get-lowest-leave leaves)
+  (define (iter l lowest)
+    (cond ((null? l) lowest)
+          ((< (cadar l) (cadr lowest))
+            (iter (cdr l) (car l)))
+          (else (iter (cdr l) lowest))))
+  (iter (cdr leaves) (car leaves)))
+
+(define leaves '((A 8) (B 3) (C 1) (D 1) (E 1) (F 1) (G 1) (H 1)))
+
+(get-lowest-leave leaves)
+
+(< (cadar leaves) 3)
+
+(define (lowest-leave? leaves leave)
+  (cond ((null? leaves) #t)
+        ((and (< (cadar leaves) (cadr leave))
+              (not (= (cadar leaves) (cadr leave)))) #f)
+        (else (lowest-leave? (cdr leaves) leave))))
+
+(define (merge l1 l2)
+  (list (list (car l1) (car l2)) (+ (cadr l1) (cadr l2))))
+
+(lowest-leave? leaves '(A 8))
+(lowest-leave? leaves '(C 1))
+(lowest-leave? leaves '(D 1))
+(merge '(A 8) '(B 8))
+
