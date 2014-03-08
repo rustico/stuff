@@ -871,17 +871,17 @@
 (intersection-tree t1 t2)
 
 ; Huffman
-(define (get-lowest-leave leaves)
+(define (get-lowest-leaf leaves)
   (define (iter l lowest)
     (cond ((null? l) lowest)
-          ((< (cadar l) (cadr lowest))
+          ((< (get-weight (cdar l)) (get-weight (cdr lowest)))
             (iter (cdr l) (car l)))
           (else (iter (cdr l) lowest))))
   (iter (cdr leaves) (car leaves)))
 
 (define leaves '((A 8) (B 3) (C 1) (D 1) (E 1) (F 1) (G 1) (H 1)))
 
-(get-lowest-leave leaves)
+(get-lowest-leaf leaves)
 
 (< (cadar leaves) 3)
 
@@ -891,11 +891,98 @@
               (not (= (cadar leaves) (cadr leave)))) #f)
         (else (lowest-leave? (cdr leaves) leave))))
 
-(define (merge l1 l2)
-  (list (list (car l1) (car l2)) (+ (cadr l1) (cadr l2))))
-
 (lowest-leave? leaves '(A 8))
 (lowest-leave? leaves '(C 1))
 (lowest-leave? leaves '(D 1))
+
 (merge '(A 8) '(B 8))
+
+(define (remove l item)
+  (cond ((null? l) '())
+        ((equal? (car l) item) (remove (cdr l) item))
+        (else (cons (car l) (remove (cdr l) item)))))
+
+(remove leaves '(B 3))
+
+(define (exists? l item)
+  (cond ((null? l) #f)
+        ((equal? (car l) item) #t)
+        (else (exists (cdr l) item))))
+(exists? leaves '(B 3))
+(exists? leaves '(B 4))
+
+(define (remove-list l list-of-items)
+  (cond ((null? l) '())
+        ((exists? list-of-items (car l)) (remove-list (cdr l) list-of-items))
+        (else (cons (car l) (remove-list (cdr l) list-of-items)))))
+
+(define (get-lowest-pair-leaves leaves)
+  (let ((l1 (get-lowest-leaf leaves)))
+    (let ((l2 (get-lowest-leaf (remove leaves l1))))
+      (list l1 l2))))
+      
+(define (get-weight leaf)
+  (if (equal? (cdr leaf) '())
+      (car leaf)
+      (get-weight (cdr leaf))))
+
+(get-weight '(B 4))
+
+(define (merge l)
+  (let ((l1 (car l))
+        (l2 (cadr l)))
+    (list (car l1) (car l2) (+ (get-weight l1) (get-weight l2)))))
+
+(merge '((c d 2) (e f 2)))
+(define (letters l)
+  (cond ((null? l) '())
+        ((number? (car l)) (letters (cdr l)))
+        (else (cons (car l) (letters (cdr l))))))
+
+(letters '(c d 2))
+(letters '(c 2 ))
+
+(define (merge-leaves leaves)
+  (let ((l1 (car leaves))
+        (l2 (cadr leaves)))
+    (append (append (letters l1) (letters l2)) (list (+ (get-weight l1) (get-weight l2))))))
+            
+(merge-leaves '((c d 2) (e f 2)))
+(merge-leaves '((c  2) (e  2)))
+
+(get-lowest-pair-leaves leaves)
+
+(remove-list leaves (get-lowest-pair-leaves leaves))
+(merge (get-lowest-pair-leaves leaves))
+(get-weight (merge (get-lowest-pair-leaves leaves)))
+
+(define (huffman-leaves leaves)
+  (let ((lowest-leaves (get-lowest-pair-leaves leaves)))
+    (let ((leaf (merge-leaves lowest-leaves)))
+      (append (remove-list leaves lowest-leaves) (list leaf)))))
+
+
+(define lowest (merge (get-lowest-pair-leaves leaves)))
+(define htree '((a 8) (b 3) (c d 2) (e 1) (f 1) (g 1) (h 1)))
+(remove htree '(c d 2))
+
+(huffman-leaves leaves)
+(get-lowest-pair-leaves leaves)
+(merge (get-lowest-pair-leaves leaves))
+(remove leaves (get-lowest-pair-leaves leaves))
+(remove-list leaves (get-lowest-pair-leaves leaves))
+
+(define h2  '((a 8) (b 3) (c d 2) (e f 2) (g h 2)))
+(get-lowest-pair-leaves h2)
+
+(car (huffman-leaves leaves))
+(cdr (huffman-leaves leaves))
+
+
+(define (huffman leaves)
+  (if (= (length leaves) 1)
+      leaves
+      (huffman (huffman-leaves leaves))))
+
+(huffman leaves)
 
