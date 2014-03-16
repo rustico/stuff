@@ -1,0 +1,86 @@
+;1 (libro)
+(define balance 100)
+
+(define (withdraw amount)
+  (if (>= balance amount)
+    (begin (set! balance (- balance amount))
+           balance)
+    "Insufficient funds"))
+
+(define new-withdraw
+  (let ((balance 100))
+    (lambda (amount)
+      (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))))
+
+(new-withdraw 25)
+(new-withdraw 25)
+(new-withdraw 65)
+
+(define (make-account balance)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (dispatch m)
+    (cond ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request " m))))
+  dispatch)
+
+(define W1 (make-account 100))
+(define (deposit amount) ((W1 'deposit) amount))
+(define (withdraw amount) ((W1 'withdraw) amount))
+(deposit 30)
+(withdraw 10)
+
+;3.1
+(define (make-accumulator initial)
+  (lambda (n) 
+    (set! initial (+ n initial))
+    initial))
+
+(define A (make-accumulator 5))
+(A 10)
+(A 10)
+
+;3.2 
+(define (make-monitored proc)
+  (let ((acc 0))
+    (lambda (args)
+      (if (eq? args 'how-many-calls?)
+          acc
+          (begin (set! acc (+ 1 acc))
+                 (proc args))))))
+
+(define s (make-monitored sqrt))
+(s 100)
+(s 'how-many-calls?)
+
+;3.3
+(define (make-account balance stored-password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (dispatch password m)
+    (if (equal? stored-password password)
+        (cond ((eq? m 'withdraw) withdraw)
+              ((eq? m 'deposit) deposit)
+              (else (error "Unknown request " m)))
+        (lambda (n) "Incorrect password")))
+  dispatch)
+
+(define acc (make-account 100 '1234))
+((acc '1234 'withdraw) 40)
+((acc '12345 'deposit) 50)
