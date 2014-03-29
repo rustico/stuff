@@ -423,30 +423,21 @@ x ; bucle infinito
 ;3.25
 (define (make-table)
   (let ((local-table (list '*table*)))
-    (define (lookup2 key-1 key-2)
-      (let ((subtable (assoc key-1 (cdr local-table))))
-        (if subtable
-            (let ((record (assoc key-2 (cdr subtable))))
-              (if record
-                  (cdr record)
-                  false))
-            false)))
-
     (define (lookup keys)
       (define (iter k table)
+        (display table)
+        (newline)
         (if (null? k)
-            table
+            (cdr table)
             (let ((record (assoc (car k) (cdr table))))
               (if record
                 (begin 
-                  (display record)
-                  (newline)
-                (iter (cdr k) (cdr record)))
+                (iter (cdr k) record))
                 #f ))))
       (iter keys local-table))
 
 
-    (define (insert! key-1 key-2 value)
+    (define (insert2! key-1 key-2 value)
       (let ((subtable (assoc key-1 (cdr local-table))))
         (if subtable
           (let ((record (assoc key-2 (cdr subtable))))
@@ -460,17 +451,63 @@ x ; bucle infinito
                                 (cons key-2 value))
                           (cdr local-table)))))
       'ok)
+
+    (define (insert! keys value)
+      (define (iter keys table)
+        (let ((st (assoc (car keys) (cdr table))))
+          (if st
+              (if (null? (cdr keys))
+                  (set-cdr! st value)
+                  (iter (cdr keys) st))
+              (if (null? (cdr keys))
+                  (display table)
+                  (set-cdr! table
+                            (cons (cons (car keys) value)
+                                  (cdr table)))
+                  (begin
+                    (set-cdr! table (cons (car keys) (cdr table)))
+                    (iter (cdr keys) (car table)))))))
+      (iter keys local-table))
+
     (define (dispatch m)
       (cond ((eq? m 'lookup-proc) lookup)
             ((eq? m 'insert-proc) insert!)
+            ((eq? m 'insert-proc2) insert2!)
+            ((eq? m 'show) (lambda () (display local-table)))
             (else (error "Error"))))
     dispatch))
 
 (define operation-table (make-table))
 (define get (operation-table 'lookup-proc))
 (define put (operation-table 'insert-proc))
+(define put2 (operation-table 'insert-proc2))
+(define show (operation-table 'show))
 
-(put 'numeros 'dos 2)
-(put 'numeros 'tres 3)
-(get 'numeros 'dos)
+(put '(dos) 2)
+(get '(dos))
+
+(put '(numeros dos) 2)
+(put '(numeros dos) 2)
+(put '(numeros tres) 3)
+(get '(numeros dos))
 (get '(numeros tres))
+
+(show)
+
+(put2 'numeros 'dos 3)
+(put '(numeros dos) 3)
+(put '(numeros tres) 3)
+(put '(numeros cuatro) 4)
+(get '(numeros tres))
+(get '(numeros dos))
+(get '(numeros cuatro))
+
+(put '(letras a) 'a)
+(put2 'letras2 'b 'b)
+
+
+'(*table* (numeros) (dos . 2))
+'(*table* (numeros (dos . 3)))
+
+(put '(letras vocales a) 'a)
+(get '(letras vocales a))
