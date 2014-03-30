@@ -425,8 +425,6 @@ x ; bucle infinito
   (let ((local-table (list '*table*)))
     (define (lookup keys)
       (define (iter k table)
-        (display table)
-        (newline)
         (if (null? k)
             (cdr table)
             (let ((record (assoc (car k) (cdr table))))
@@ -436,22 +434,6 @@ x ; bucle infinito
                 #f ))))
       (iter keys local-table))
 
-
-    (define (insert2! key-1 key-2 value)
-      (let ((subtable (assoc key-1 (cdr local-table))))
-        (if subtable
-          (let ((record (assoc key-2 (cdr subtable))))
-            (if record
-                (set-cdr! record value)
-                (set-cdr! subtable
-                          (cons (cons key-2 value)
-                                (cdr subtable)))))
-          (set-cdr! local-table
-                    (cons (list key-1
-                                (cons key-2 value))
-                          (cdr local-table)))))
-      'ok)
-
     (define (insert! keys value)
       (define (iter keys table)
         (let ((st (assoc (car keys) (cdr table))))
@@ -460,19 +442,17 @@ x ; bucle infinito
                   (set-cdr! st value)
                   (iter (cdr keys) st))
               (if (null? (cdr keys))
-                  (display table)
                   (set-cdr! table
                             (cons (cons (car keys) value)
                                   (cdr table)))
                   (begin
-                    (set-cdr! table (cons (car keys) (cdr table)))
-                    (iter (cdr keys) (car table)))))))
+                    (set-cdr! table (cons (cons (car keys) '()) (cdr table)))
+                    (iter (cdr keys) (cadr table)))))))
       (iter keys local-table))
 
     (define (dispatch m)
       (cond ((eq? m 'lookup-proc) lookup)
             ((eq? m 'insert-proc) insert!)
-            ((eq? m 'insert-proc2) insert2!)
             ((eq? m 'show) (lambda () (display local-table)))
             (else (error "Error"))))
     dispatch))
@@ -480,34 +460,24 @@ x ; bucle infinito
 (define operation-table (make-table))
 (define get (operation-table 'lookup-proc))
 (define put (operation-table 'insert-proc))
-(define put2 (operation-table 'insert-proc2))
 (define show (operation-table 'show))
 
 (put '(dos) 2)
 (get '(dos))
+(put '(dos) 5)
+(get '(dos))
 
-(put '(numeros dos) 2)
 (put '(numeros dos) 2)
 (put '(numeros tres) 3)
 (get '(numeros dos))
 (get '(numeros tres))
 
-(show)
 
-(put2 'numeros 'dos 3)
 (put '(numeros dos) 3)
-(put '(numeros tres) 3)
 (put '(numeros cuatro) 4)
 (get '(numeros tres))
 (get '(numeros dos))
 (get '(numeros cuatro))
-
-(put '(letras a) 'a)
-(put2 'letras2 'b 'b)
-
-
-'(*table* (numeros) (dos . 2))
-'(*table* (numeros (dos . 3)))
 
 (put '(letras vocales a) 'a)
 (get '(letras vocales a))
