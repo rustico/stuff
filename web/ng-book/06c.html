@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>  
+<head>
+  <title>Simple app</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.js"> </script>
+</head>
+<body>
+
+  <div ng-controller="FirstController">
+    <div>
+      <input ng-model="person.name" type="text" placeholder="Nombre">
+      <input ng-model="person.age" type="number" placeholder="Edad">
+      <button ng-click="add(person)" class="button">Add</button>
+    </div>
+
+    <hr>
+    <div>
+      <input ng-model="search" type="text">
+      {{ people | filter:search }}
+    </div>
+
+  </div>
+
+  <script src="06c.js"> </script>
+</body>
+</html>
+
+<!--
+| orderBy:'name'
+
+{{ 'hola' | masNico}}
+-->

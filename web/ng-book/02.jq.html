@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html> 
+<head>
+  <title>Simple app</title>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"> </script>
+</head>
+<body>
+  <h5></h5>
+
+  <script>
+    $(function() {
+        function updateClock() {
+          $('h5').text(new Date());
+        }
+
+        setInterval(function() {
+            updateClock();
+        }, 1000);
+
+        updateClock();
+    });
+  </script>
+</body>
+</html>
