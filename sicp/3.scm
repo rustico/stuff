@@ -367,6 +367,74 @@ x ; bucle infinito
 ((q 'insert!) 4)
 (q 'print)
 
+;; deque
+(define (make-deque)
+  (let ((front-ptr '()) 
+	(rear-ptr '()))
+      (define (empty?) (null? front-ptr))
+
+      (define (front-insert! item)
+        (let ((new-pair (cons item '())))
+          (cond ((empty?) (set! front-ptr new-pair)
+                          (set! rear-ptr new-pair))
+                (else
+                  (set-cdr! new-pair front-ptr)
+                  (set! front-ptr new-pair)))))
+
+      (define (rear-insert! item)
+        (let ((new-pair (cons item '())))
+          (cond ((empty?) (set! front-ptr new-pair)
+                          (set! rear-ptr new-pair))
+                (else
+                  (set-cdr! rear-ptr new-pair)
+                  (set! rear-ptr new-pair)))))
+
+      (define (delete-front!)
+        (if (empty?)
+            (error "Empty queue")
+            (set! front-ptr (cdr front-ptr))))
+
+      (define (element-to-rear front-ptr)
+	(define (iter l)
+	  (cond ((null? l) '())
+		((null? (cdr l)) l)
+		((null? (cddr l)) l)
+		(else (iter (cdr l)))
+	))
+	(iter front-ptr))
+
+      (define (delete-rear!)
+	(if (empty?)
+	    (error "Empty queue")
+	    (let ((ptr-to-rear (element-to-rear front-ptr)))
+		  (set-cdr! ptr-to-rear '()))
+	  ))
+
+      (define (dispatch m)
+        (cond ((eq? m 'empty?) (empty?))
+              ((eq? m 'insert-front!) front-insert!)
+	      ((eq? m 'insert-rear!) rear-insert!)
+              ((eq? m 'front) front-ptr)
+              ((eq? m 'rear) rear-ptr)
+              ((eq? m 'delete-front!) (delete-front!))
+              ((eq? m 'delete-rear!) (delete-rear!))
+              (else (error "Error"))))
+      dispatch))
+
+(define dq (make-deque))
+(define dq-insert-front (dq 'insert-front!))
+(define dq-insert-rear (dq 'insert-rear!))
+
+(dq-insert-front 1)
+(dq-insert-front 2)
+(dq-insert-front 3)
+(dq-insert-front 4)
+(dq-insert-rear 1)
+(dq-insert-rear 2)
+(dq-insert-rear 3)
+(dq-insert-rear 4)
+
+
 ; Tables
 ; 1D
 (define (lookup key table)
