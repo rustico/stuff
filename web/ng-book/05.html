@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>  
+<head>
+  <title>Simple app</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.js"> </script>
+</head>
+<body>
+
+  <div ng-controller="FirstController">
+    <h4>The simplest adding machine ever</h4>
+    <button ng-click="add(1)" class="button">Add</button>
+    <a ng-click="subtract(1)" class="button alert">Subtract</a> <h4>Current count: {{ counter }}</h4>
+  </div>
+
+  <script src="05.js"> </script>
+
+  <!-- 
+    <input ng-model="amount" type="number">
+  -->
+</body>
+</html>

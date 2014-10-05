@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>  
+<head>
+  <title>Simple app</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.js"> </script>
+</head>
+<body>
+
+  <div ng-controller="FirstController">
+
+    <form name="person_form" ng-submit="addPerson()" novalidate>
+      <input name="name" ng-model="person.name" type="text" placeholder="Nombre" required>
+      <span ng-show="person_form.name.$dirty && person_form.name.$invalid"> Nombre Obligatorio </span>
+
+      <input name="age" ng-model="person.age" type="number" placeholder="Edad" required>
+      <span ng-show="person_form.age.$dirty && person_form.age.$invalid"> Edad Invalida </span>
+
+
+      <button ng-disabled="person_form.$invalid"
+              class="button" 
+              type="submit">
+              Add
+      </button>
+    </form>
+
+    <hr>
+    <div>
+      <input ng-model="search" type="text">
+      <div>
+        <span ng-repeat="person in people | filter:search">
+          {{ person.name }} - {{ person.age }} 
+          <button ng-click="remove(person)" class="button">Delete</button>
+          <br>
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="07.js"> </script>
+</body>
+</html>
+
+<!--
+
+<input type="text" ng-minlength=5 />
+<input type="text" ng-maxlength=20 />
+
+<input type="text" ng-pattern="/a-zA-Z/" />
+<input type="email" name="email" ng-model="user.email" />
