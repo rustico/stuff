@@ -550,6 +550,54 @@ x ; bucle infinito
 (put '(letras vocales a) 'a)
 (get '(letras vocales a))
 
+;3.26
+(define (binary-tree root)
+  (list root '() '())
+)
+
+(define (left-node node)
+  (cadr node)
+)
+
+(define (right-node node)
+  (caddr node)
+)
+
+(define (key-node node)
+  (car node)
+)
+
+(define (set-left-node parent node)
+  (set-car! (cdr parent) node)
+)
+
+(define (set-right-node parent node)
+  (set-car! (cddr parent) node)
+)
+
+(define (search-parent-node t element)
+  (cond ((null? (cdr t)) t)
+	((> (key-node t) element)
+	 (if (null? (left-node t))
+	     t
+	     (search-parent-node (left-node t) element)))
+	(else
+	 (if (null? (right-node t))
+	     t
+	     (search-parent-node (right-node t) element)))
+))
+
+(define (binary-tree-add t element)
+  (let ((parent-node (search-parent-node t element))
+	(child-node (list element '() '())))
+    (if (> (key-node parent-node) element)
+	(set-left-node parent-node child-node)
+	(set-right-node parent-node child-node))
+    ))
+
+(define t '(5 (3 () ()) (8 () ())))
+(define t '(5 (3 (1) (4)) (8)))
+
 ;3.27
 (define memo-fib
   (memoize (lambda (n)
